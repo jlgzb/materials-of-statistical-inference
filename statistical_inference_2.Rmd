@@ -1,0 +1,163 @@
+---
+title: "Basic inferential data_analysis"
+author: "Zhibin Guan"
+output: pdf_document
+---
+
+## Overview
+
+This is the second portion of the statistical interfence course project (coursera).
+  
+The basic information of ToothGrowth data:
+
+1. `len`: Tooth length in millimeters (numeric variable);
+2. `supp`: Supplement type (factor variable with levels ascorbic acid (VC) and orange juice (OJ);
+3. `dose`: Dose in miligrams (numeric variable) -- 0.5, 1, or 2 mg/day.
+
+## Demands
+
+1. Load the ToothGrowth data and perform some basic exploratory data analysis;
+2. Provide a basic summary of the data;
+3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+4. State your conclusions and the assumptions needed for your conclusions.
+
+## Answers
+
+### Pre-processing for this second portion of the project
+
+Load the needed libraries:
+```{r load libraries, message=FALSE}
+library(datasets)
+library(dplyr)
+library(stringr)
+library(broom)
+library(ggplot2)
+```
+
+### Answer of demand 1
+
+Recall demand 1: load ToothGrowth data and perform some basic EDA.
+```{r load ToothGrowth data, cache=TRUE, echo=FALSE}
+dat <- datasets::ToothGrowth
+```
+
+```{r summary of data}
+str(dat)
+summary(dat)
+```
+
+Plot the ToothGrowth data according level supp -- OJ and VC:  
+```{r figure, echo=FALSE}
+# level of dose: 0.5, 1, 2 mg
+ggplot(dat, aes(x = factor(dose), y = len)) +
+    facet_grid(.~supp) +
+    geom_boxplot(aes(fill = supp)) +
+    labs(title = "Tooth length by dose level (group VC and group OJ)",
+         x = "Dose (mg/day)",
+         y = "Tooth Length")
+```
+
+### Answer of demand 2 -- Basic summary of the ToothGrowth data.
+
+The box plots show that the tooth length increases as dose increases in both group (OJ and VC). Differently, OJ is more effective than VC for tooth growth when dose equal 0.5 mg/day and 1 mg/day. And the effective of OJ and VC for tooth growth is equal when dose is 2 mg/day.
+
+
+### Answer of demand 3 -- Hypothesis tests
+
+Recall demand 3: use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose.  
+
+Since the number of samples of each group (OJ and VC) is less than 30, the standard error estimate is not accurate. Therefore, the T distribution is a well option.
+
+**Hypothese #1**:
+OJ and AC generate the same effect for tooth growth accordind to the ToothGrouth data.
+
+```{r hypothese 1, echo=FALSE, results="hide"}
+t_test_1 <- t.test(len ~ supp, data = dat)
+#tidy(t_test_1)
+t_test_1$conf
+t_test_1$p.value
+```
+
+The confidence interval of hypothese 1:
+```{r conf of hypothese 1, echo=FALSE}
+t_test_1$conf
+```
+The p-value of hypothese 1:
+```{r p-value of hypothese 1, echo=FALSE}
+t_test_1$p.value
+```
+Conclusion of test_1: we can observe that the confidence intervals is (-0.1710156, 7.571016) which contains 0, and the p-value is about 0.06 which is greater than the alpha 0.05. Hence, we fail to reject the null hypothesis 1.
+
+**Hypothese #2**:
+OJ and AC generate the same effect for tooth growth when doss is 0.5 mg/day.
+
+```{r hypothese 2, echo=FALSE, results="hide"}
+t_test_2 <- t.test(len ~ supp, data = subset(dat, dose == 0.5))
+#tidy(t_test_2)
+t_test_2$conf
+t_test_2$p.value
+```
+
+The confidence interval of hypothese 2:
+```{r conf of hypothese 2, echo=FALSE}
+t_test_2$conf
+```
+The p-value of hypothese 2:
+```{r p-value of hypothese 2, echo=FALSE}
+t_test_2$p.value
+```
+
+Conclusion of test_2: the confidence intervals does not contains 0, and the p-values is about 0.006 which is less than alpha 0.05. Hence, we can reject the null hypothesis 2.
+
+**Hypothese #3**:
+OJ and AC generate the same effect for tooth growth when doss is 1 mg/day.
+
+```{r hypothese 3, echo=FALSE, results="hide"}
+t_test_3 <- t.test(len ~ supp, data = subset(dat, dose == 1))
+#tidy(t_test_2)
+t_test_3$conf
+t_test_3$p.value
+```
+
+The confidence interval of hypothese 3:
+```{r conf of hypothese 3, echo=FALSE}
+t_test_3$conf
+```
+The p-value of hypothese 3:
+```{r p-value of hypothese 3, echo=FALSE}
+t_test_3$p.value
+```
+
+Conclusion of test_3: the confidence intervals does not contains 0, and the p-values is about 0.001 which is less than alpha 0.05. Hence, we can reject the null hypothesis 3.
+
+
+**Hypothese #4**:
+OJ and AC generate the same effect for tooth growth when doss is 2 mg/day.
+```{r hypothese 4, echo=FALSE, results='hide'}
+t_test_4 <- t.test(len ~ supp, data = subset(dat, dose == 2))
+#tidy(t_test_2)
+t_test_4$conf
+t_test_4$p.value
+```
+
+The confidence interval of hypothese 4:
+```{r conf of hypothese 4, echo=FALSE}
+t_test_4$conf
+```
+The p-value of hypothese 4:
+```{r p-value of hypothese 4, echo=FALSE}
+t_test_4$p.value
+```
+
+Conclusion of test_4: the confidence intervals contains 0, and the p-values is about 0.964 which is greate than alpha 0.05. Hence, we fail reject the null hypothesis 4. What's more, the p-value is too big, we can accept the null hypothesis 4.
+
+### Answer of demand 4:
+Recall demand 4: state your conclusions and the assumptions needed for your conclusions
+
+**Conclusions and assumptions**
+OJ and AC generate the same effect for tooth growth when dose is 2 mg/day. Different, OJ generate more effect than AC when dose is 0.5 and 1 mg/day. Therefore, 
+
+Assumptions:
+* The ToothGrowth data is approximately normal distribution
+* When the number of dose is greater than 2 mg/day, the OJ and AC generate similar effect for tooth growth.
+
